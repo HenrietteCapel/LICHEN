@@ -1,5 +1,7 @@
 # Byte-compiled
 __pycache__/
+*.pyc
+*.csv
 
 # Dependencies
 ANARCI/
