@@ -4,6 +4,7 @@ import random
 import pandas as pd
 import math
 import time
+from typing import Union, List, Optional
 
 from .load_model import load_model, configure_cpus, configure_device
 from .utils import passing_anarcii_filtering, passing_humatch, AbLang2_confidence, diversity_AbLang2, MAP_TYPE_SEED, MAP_GENE_FAM_SEED, MAP_GENE_SEED
@@ -19,7 +20,15 @@ class LICHEN():
         self.used_device = configure_device(cpu, self.ncpu)
         self.LICHEN = load_model(path_to_model, self.used_device)
 
-    def light_generation(self, input:str|list, germline_seed:list=[None], custom_seed:str=None, cdrs:list=[None, None, None], numbering_scheme:str='IMGT',n:int=1, filtering:list=None):
+    def light_generation(self, 
+                        input: Union[str, List[str]], 
+                        germline_seed: Optional[List[str]] = None, 
+                        custom_seed: Optional[str] = None, 
+                        cdrs: Optional[List[Optional[str]]] = None, 
+                        numbering_scheme: str = 'IMGT',
+                        n: int = 1, 
+                        filtering: Optional[List[str]] = None):
+
         """Generate light sequences for the input heavy sequence
         
         Parameters
@@ -45,6 +54,15 @@ class LICHEN():
             When filtering requested 10 times more sequences will be generated than
             requested to apply filtering on. 
         """
+        if germline_seed is None:
+            germline_seed = []
+
+        if cdrs is None:
+            cdrs = [None, None, None]
+
+        if filtering is None:
+            filtering = []
+
         # Check input formats
         if isinstance(input, str):
             input = [input]
