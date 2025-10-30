@@ -116,7 +116,7 @@ class LICHEN():
         for rep in range(repeats):
             # Update the user
             if verbose and rep!=0 and (rep)%5==0:
-                print(f'Generated {rep}/{repeats} sequences...')
+                print(f'Generated {rep}/{repeats} sequences...', flush=True)
 
             # Sample a seed from possible seeds (if given)
             if light_seeds:
@@ -131,8 +131,6 @@ class LICHEN():
                 break
 
             if filtering and 'ANARCII' in filtering or light_cdr:
-                if verbose:
-                    print('Check numbering/cdrs of generated sequence...')
                 if not passing_anarcii_filtering(gen_light, light_cdr, numbering_scheme, ncpu=self.ncpu):
                     continue 
             if filtering and 'Humatch' in filtering:

@@ -1,6 +1,33 @@
 import numpy as np
 import pandas as pd
 
+# Install anarcii
+try:
+    from anarcii import Anarcii
+    import io
+    import sys
+except ImportError as e:
+    raise ImportError(
+        """
+        ANARCII is required.
+        Please install it using the instructions in the README.
+        """
+    ) from e
+
+# Run ANARCII while silencing its output
+text_trap = io.StringIO()
+sys.stdout = text_trap
+
+model = Anarcii(seq_type="antibody", 
+                batch_size=1, 
+                cpu=True, 
+                ncpu=1, 
+                mode="speed", 
+                verbose=False)
+
+sys.stdout = sys.__stdout__
+
+
 MAP_FR1_FR3 = {'NI': ['SL'],
                'AI': ['SL']*7+['TL']*6,
                'QT': ['NK']*1+['TR']*2,
@@ -175,7 +202,7 @@ MAP_GENE_SEED = {'IGLV1-36': ['QSVLTQPPSV'], 'IGLV1-40': ['QSVLTQPPSV', 'QSVVTQP
                      'IGKV3D-20': ['EIVLTQSPAT', 'EIVLTQSPAT'], 'IGKV3D-7': ['EIVMTQSPAT'], 'IGKV4-1': ['DIVMTQSPDS', 'DIVMTQSPDS', 'DIVMTQSPDS'], 'IGKV5-2': ['ETTLTQSPAF', 'ETTLTQSPAF'], 
                      'IGKV6-21': ['EIVLTQSPDF', 'EIVLTQSPDF'], 'IGKV6D-21': ['EIVLTQSPDF', 'EIVLTQSPDF'], 'IGKV6D-41': ['DVVMTQSPAF'], 'IGKV7-3': ['DIVLTQSPAS']}
     
-def passing_anarcii_filtering(generated_light_sequence, light_cdr, light_cdr_scheme, ncpu=1):
+def passing_anarcii_filtering(generated_light_sequence, light_cdr, light_cdr_scheme, ncpu):
     """Run ANARCII and determine if the sequence can be numbered and is recognised
     as a light chain. If CDRs are provided correctness of grafting into the 
     generated sequence is checked.
@@ -191,24 +218,6 @@ def passing_anarcii_filtering(generated_light_sequence, light_cdr, light_cdr_sch
     ncpu :
         Number of CPUs to use.
     """
-
-    try:
-        from anarcii import Anarcii
-        import io
-        import sys
-    except ImportError as e:
-        raise ImportError(
-            """
-            ANARCII is required to run this function.
-            Please install it using the instructions in the README.
-            """
-        ) from e
-    # Run ANARCII while silencing its output
-    text_trap = io.StringIO()
-    sys.stdout = text_trap
-    model = Anarcii(seq_type="antibody", batch_size=1, cpu=True, ncpu=ncpu, mode="speed", verbose=False)
-    sys.stdout = sys.__stdout__
-
     sequence = [('generated_light', generated_light_sequence)]
     results =  model.number(sequence)
     legacy_format = model.to_legacy()
